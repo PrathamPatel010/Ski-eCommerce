@@ -10,9 +10,9 @@ namespace API.Controllers
     public class ProductController(IProductRepository repo) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand,string? type)
         {
-            return Ok(await repo.GetProductsAsync());
+            return Ok(await repo.GetProductsAsync(brand,type));
         }
 
         [HttpGet("{id:int}")]
@@ -67,6 +67,18 @@ namespace API.Controllers
 
         private bool ProductExists(int id){
             return repo.ProductExist(id);
+        }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<List<string>>> GetBrands(){
+            var brands = await repo.GetBrandsAsync();
+            return Ok(brands);
+        }
+
+        [HttpGet("types")]
+        public async Task<ActionResult<List<string>>> GetTypes(){
+            var types = await repo.GetTypesAsync();
+            return Ok(types);
         }
     }
 }
