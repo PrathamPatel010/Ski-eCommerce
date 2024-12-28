@@ -28,7 +28,7 @@ namespace Infrastructure.Data
             return await context.Products.FindAsync(id);
         }
 
-        public async Task<IReadOnlyList<Product>> GetProductsAsync(string? brands, string? types, string? sort)
+        public async Task<PaginatedResult<Product>> GetProductsAsync(string? brands, string? types, string? sort,int pageSize=3,int pageIndex=0)
         {
             var query = context.Products.AsQueryable();
             if (!string.IsNullOrEmpty(brands))
@@ -48,7 +48,17 @@ namespace Infrastructure.Data
                 "priceDesc" => query.OrderByDescending(p => p.Price),
                 _ => query.OrderBy(p => p.Name),
             };
-            return await query.ToListAsync();
+
+            var totalCount=await query.CountAsync();
+            
+            var paginatedProducts = await query.Skip(pageIndex*pageSize).Take(pageSize).ToListAsync();
+            
+            return new PaginatedResult<Product>{
+                TotalCount=totalCount,
+                PageSize=pageSize,
+                PageIndex=pageIndex,
+                Items=paginatedProducts,
+            };
         }
 
 

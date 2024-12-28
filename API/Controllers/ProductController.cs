@@ -10,9 +10,9 @@ namespace API.Controllers
     public class ProductController(IProductRepository repo) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brands,string? types,string? sort)
+        public async Task<ActionResult<PaginatedResult<Product>>> GetProducts(string? brands,string? types,string? sort,int pageSize,int pageIndex)
         {
-            return Ok(await repo.GetProductsAsync(brands,types,sort));
+            return Ok(await repo.GetProductsAsync(brands,types,sort,pageSize,pageIndex));
         }
 
         [HttpGet("{id:int}")]
