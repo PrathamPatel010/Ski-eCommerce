@@ -28,7 +28,7 @@ namespace Infrastructure.Data
             return await context.Products.FindAsync(id);
         }
 
-        public async Task<PaginatedResult<Product>> GetProductsAsync(string? brands, string? types, string? sort,int pageSize=3,int pageIndex=0)
+        public async Task<PaginatedResult<Product>> GetProductsAsync(string? brands, string? types, string? sort,string? search,int pageIndex=0,int pageSize=3)
         {
             var query = context.Products.AsQueryable();
             if (!string.IsNullOrEmpty(brands))
@@ -40,6 +40,12 @@ namespace Infrastructure.Data
             {
                 var typesList = types.Split(',').Select(t => t.Trim().ToLower()).ToList();
                 query = query.Where(p => typesList.Contains(p.Type.ToLower()));
+            }
+
+            if(!string.IsNullOrEmpty(search))
+            {
+                var searchTerm = search.Trim().ToLower();
+                query = query.Where(p=>p.Name.ToLower().Contains(searchTerm));
             }
 
             query = sort switch
@@ -60,7 +66,6 @@ namespace Infrastructure.Data
                 Items=paginatedProducts,
             };
         }
-
 
         public async Task<IReadOnlyList<string>> GetTypesAsync()
         {
