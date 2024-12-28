@@ -28,24 +28,29 @@ namespace Infrastructure.Data
             return await context.Products.FindAsync(id);
         }
 
-        public async Task<IReadOnlyList<Product>> GetProductsAsync(string? brand,string? type,string? sort)
+        public async Task<IReadOnlyList<Product>> GetProductsAsync(string? brands, string? types, string? sort)
         {
             var query = context.Products.AsQueryable();
-            if(!string.IsNullOrEmpty(brand)){
-                query = query.Where(p=>p.Brand==brand);
+            if (!string.IsNullOrEmpty(brands))
+            {
+                var brandsList = brands.Split(',').Select(b => b.Trim().ToLower()).ToList();
+                query = query.Where(p => brandsList.Contains(p.Brand.ToLower()));
             }
-            if(!string.IsNullOrEmpty(type)){
-                query = query.Where(p=>p.Type==type);
+            if (!string.IsNullOrEmpty(types))
+            {
+                var typesList = types.Split(',').Select(t => t.Trim().ToLower()).ToList();
+                query = query.Where(p => typesList.Contains(p.Type.ToLower()));
             }
+
             query = sort switch
             {
-                "priceAsc"=>query.OrderBy(p=>p.Price),
-                "priceDesc"=>query.OrderByDescending(p=>p.Price),
-                _ => query.OrderBy(p=>p.Name),
+                "priceAsc" => query.OrderBy(p => p.Price),
+                "priceDesc" => query.OrderByDescending(p => p.Price),
+                _ => query.OrderBy(p => p.Name),
             };
-            
             return await query.ToListAsync();
         }
+
 
         public async Task<IReadOnlyList<string>> GetTypesAsync()
         {
