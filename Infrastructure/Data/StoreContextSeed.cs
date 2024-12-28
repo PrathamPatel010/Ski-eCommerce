@@ -13,7 +13,7 @@ namespace Infrastructure.Data
         {
             if(!context.Products.Any())
             {
-                var ProductsData = await File.ReadAllTextAsync("./products.json");
+                var ProductsData = await File.ReadAllTextAsync("../Infrastructure/Data/SeedData/products.json");
                 var products = JsonSerializer.Deserialize<List<Product>>(ProductsData);
                 if(products==null)      return;
                 context.Products.AddRange(products);
